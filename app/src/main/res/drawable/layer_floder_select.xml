@@ -1,0 +1,26 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape
+            android:dither="true"
+            android:innerRadiusRatio="2.5"
+            android:shape="ring"
+            android:thicknessRatio="10"
+            android:useLevel="false">
+            <solid android:color="@color/base_color" />
+
+        </shape>
+    </item>
+    <item
+        android:bottom="3.2dp"
+        android:left="3.2dp"
+        android:right="3.2dp"
+        android:top="3.2dp">
+        <shape
+            android:dither="true"
+            android:shape="oval">
+            <solid android:color="@color/base_color" />
+        </shape>
+    </item>
+
+</layer-list>

@@ -1,0 +1,55 @@
+package com.tk.wechatalbum.ui;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+
+import com.tk.wechatalbum.utils.DensityUtil;
+
+/**
+ * Created by TK on 2016/9/26.
+ */
+public class FloderItemDecoration extends RecyclerView.ItemDecoration {
+    //网格线粗细
+    public static final int DIVIDER = 1;
+    private static final ColorDrawable DRAWABLE = new ColorDrawable(0xFFECECEC);
+    private Context mContext;
+    private int divider;
+
+    public FloderItemDecoration(Context mContext) {
+        this.mContext = mContext;
+        divider = DensityUtil.dp2px(mContext, DIVIDER);
+    }
+
+    @Override
+    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+        outRect.set(0, 0, 0, divider);
+    }
+
+
+    @Override
+    public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+        drawVertical(c, parent);
+    }
+
+    public void drawVertical(Canvas c, RecyclerView parent) {
+        final int childCount = parent.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = parent.getChildAt(i);
+
+            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child
+                    .getLayoutParams();
+            final int top = child.getTop() - params.topMargin;
+            final int bottom = child.getBottom() + params.bottomMargin;
+            final int left = child.getRight() + params.rightMargin;
+            final int right = left + divider;
+
+            DRAWABLE.setBounds(left, top, right, bottom);
+            DRAWABLE.draw(c);
+        }
+    }
+
+}
