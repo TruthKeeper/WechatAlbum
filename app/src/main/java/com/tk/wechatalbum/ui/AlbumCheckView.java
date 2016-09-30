@@ -22,9 +22,9 @@ import com.tk.wechatalbum.utils.DensityUtil;
 
 public class AlbumCheckView extends View {
     public static final PorterDuffXfermode pd = new PorterDuffXfermode(PorterDuff.Mode.XOR);
-    public static final int PADDING = 2;
+    public static final float PADDING = 1.5f;
     public static final int RADIUS = 2;
-    public static final float STROKE = 1.5f;
+    public static final float STROKE = 2f;
     private Paint paint = new Paint();
     private int padding;
     private int radius;
@@ -108,8 +108,8 @@ public class AlbumCheckView extends View {
                 w - getPaddingRight(),
                 h - getPaddingBottom());
         path.reset();
-        path.moveTo(getPaddingLeft() + realW * 0.2f, getPaddingTop() + realH * 0.55f);
-        path.lineTo(getPaddingLeft() + realW * 0.38f, getPaddingTop() + realH * 0.72f);
-        path.lineTo(getPaddingLeft() + realW * 0.8f, getPaddingTop() + realH * 0.35f);
+        path.moveTo(getPaddingLeft() + realW * 0.18f, getPaddingTop() + realH * 0.5f);
+        path.lineTo(getPaddingLeft() + realW * 0.4f, getPaddingTop() + realH * 0.72f);
+        path.lineTo(getPaddingLeft() + realW * 0.82f, getPaddingTop() + realH * 0.32f);
     }
 }

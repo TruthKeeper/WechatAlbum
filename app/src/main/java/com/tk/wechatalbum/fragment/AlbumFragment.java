@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 
-import com.tk.wechatalbum.PhotoPick;
 import com.tk.wechatalbum.R;
 import com.tk.wechatalbum.adapter.AlbumAdapter;
 import com.tk.wechatalbum.adapter.AlbumAdapter.OnAlbumSelectListener;
@@ -29,6 +28,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static com.tk.wechatalbum.Constants.PhotoPickConstants;
 
 /**
  * Created by TK on 2016/9/24.
@@ -80,8 +81,7 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
         recyclerview.addItemDecoration(new AlbumItemDecoration(mContext, 3));
         albumAdapter = new AlbumAdapter(mContext,
                 albumList,
-                bundle.getBoolean(PhotoPick.SHOW_CAMERA, false),
-                bundle.getInt(PhotoPick.CHECK_LIMIT));
+                bundle.getInt(PhotoPickConstants.CHECK_LIMIT));
         albumAdapter.setOnAlbumSelectListener(onAlbumSelectListener);
         recyclerview.setAdapter(albumAdapter);
         recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -126,6 +126,8 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
     public void onComplete(List<AlbumBean> albumList, List<AlbumFolderBean> albumFolderList) {
         this.albumList.clear();
         this.albumList.addAll(albumList);
+        //防止界面闪烁，后续设置
+        albumAdapter.setShowCamera(bundle.getBoolean(PhotoPickConstants.SHOW_CAMERA, false));
         albumAdapter.notifyDataSetChanged();
         if (onFloderListener != null) {
             onFloderListener.onFloderComplete(albumFolderList);
@@ -156,9 +158,17 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
     public void setAlbumList(List<AlbumBean> albumList, boolean firstIndex) {
         this.albumList.clear();
         this.albumList.addAll(albumList);
-        albumAdapter.setShowCamera(firstIndex && bundle.getBoolean(PhotoPick.SHOW_CAMERA, false));
+        albumAdapter.setShowCamera(firstIndex && bundle.getBoolean(PhotoPickConstants.SHOW_CAMERA, false));
         albumAdapter.notifyDataSetChanged();
         recyclerview.scrollToPosition(0);
+    }
+
+    public List<AlbumBean> getAlbumList() {
+        return albumList;
+    }
+
+    public void setCheckList(List<AlbumBean> checkList) {
+        albumAdapter.setCheckList(checkList);
     }
 
     public void setOnAlbumSelectListener(OnAlbumSelectListener onAlbumSelectListener) {

@@ -20,6 +20,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by TK on 2016/9/27.
+ * 文件夹adapter
  */
 
 public class FloderAdapter extends RecyclerView.Adapter<FloderAdapter.ItemHolder> {

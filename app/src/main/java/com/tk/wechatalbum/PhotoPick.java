@@ -9,19 +9,14 @@ import com.tk.wechatalbum.activity.AlbumActivity;
 
 import java.io.File;
 
+import static com.tk.wechatalbum.Constants.PhotoPickConstants.*;
+
 /**
  * Created by TK on 2016/9/26.
  */
 
 public class PhotoPick {
     public static final String TAG = "PhotoPick";
-    public static final int CAMERA_REQUEST = 1111;
-    public static final int ALBUM_REQUEST = 2222;
-    public static final int DEFAULT_LIMIT = 9;
-    public static final String START_CAMERA = "start_camera";
-    public static final String CHECK_LIMIT = "check_limit";
-    public static final String SHOW_CAMERA = "show_camera";
-    public static final String NEED_CLIP = "need_clip";
 
     public static Builder builder() {
         return new Builder();
@@ -32,15 +27,15 @@ public class PhotoPick {
 
         public Builder() {
             bundle = new Bundle();
-            //默认单选，不显示拍照，不裁剪,选择相册模式
-            bundle.putInt(CHECK_LIMIT, 1);
-            bundle.putBoolean(SHOW_CAMERA, false);
-            bundle.putBoolean(NEED_CLIP, false);
+            //默认相册模式；一体化，单选，不裁剪
             bundle.putBoolean(START_CAMERA, false);
+            bundle.putBoolean(SHOW_CAMERA, true);
+            bundle.putInt(CHECK_LIMIT, 1);
+            bundle.putBoolean(NEED_CLIP, false);
         }
 
         /**
-         * 设置选择相册限制
+         * 设置选择相册限制,1为单选
          *
          * @param limit
          * @return
@@ -55,8 +50,8 @@ public class PhotoPick {
          *
          * @return
          */
-        public Builder showCamera() {
-            bundle.putBoolean(SHOW_CAMERA, true);
+        public Builder showCamera(boolean show) {
+            bundle.putBoolean(SHOW_CAMERA, show);
             return this;
         }
 

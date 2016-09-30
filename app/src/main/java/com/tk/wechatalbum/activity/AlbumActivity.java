@@ -3,6 +3,8 @@ package com.tk.wechatalbum.activity;
 import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,9 +19,11 @@ import android.widget.TextView;
 import com.tk.wechatalbum.R;
 import com.tk.wechatalbum.adapter.AlbumAdapter;
 import com.tk.wechatalbum.adapter.FloderAdapter;
+import com.tk.wechatalbum.bean.AlbumBean;
 import com.tk.wechatalbum.bean.AlbumFolderBean;
 import com.tk.wechatalbum.callback.OnFloderListener;
 import com.tk.wechatalbum.fragment.AlbumFragment;
+import com.tk.wechatalbum.ui.ConfirmButton;
 import com.tk.wechatalbum.ui.FloderItemDecoration;
 import com.tk.wechatalbum.utils.FloderUtils;
 
@@ -30,7 +34,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.tk.wechatalbum.R.id.shadow_layout;
+import static com.tk.wechatalbum.Constants.PhotoPickConstants;
+import static com.tk.wechatalbum.Constants.PreAlbumConstants;
 
 
 /**
@@ -38,7 +43,8 @@ import static com.tk.wechatalbum.R.id.shadow_layout;
  */
 public class AlbumActivity extends AppCompatActivity implements OnFloderListener, FloderAdapter.onFloderClickListener, AlbumAdapter.OnAlbumSelectListener {
 
-
+    @BindView(R.id.confirm_btn)
+    ConfirmButton confirmBtn;
     @BindView(R.id.folder_recyclerview)
     RecyclerView folderRecyclerview;
     @BindView(R.id.folder_text)
@@ -49,7 +55,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
     LinearLayout previewLayout;
     @BindView(R.id.shadow)
     View shadow;
-    @BindView(shadow_layout)
+    @BindView(R.id.shadow_layout)
     LinearLayout shadowLayout;
     private AlbumFragment albumFragment = new AlbumFragment();
     private FloderAdapter floderAdapter;
@@ -60,22 +66,45 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
     private ArgbEvaluator shadowArgb;
     private boolean animLock;
     private boolean shadowFlag;
+    private Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
         ButterKnife.bind(this);
+        initConstants();
+
         shadowArgb = new ArgbEvaluator();
-        albumFragment.setArguments(getIntent().getExtras());
+        //继续传递
+        albumFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().add(R.id.main_album, albumFragment).commit();
         albumFragment.setOnFloderListener(this);
         albumFragment.setOnAlbumSelectListener(this);
+
     }
 
-    @OnClick({R.id.folder_layout, R.id.preview_layout, R.id.shadow})
+    /**
+     * 接收并处理PhotoPick的配置
+     */
+    private void initConstants() {
+        bundle = getIntent().getExtras();
+        if (bundle.getInt(PhotoPickConstants.CHECK_LIMIT) == 1) {
+            //单选模式
+            previewLayout.setVisibility(View.GONE);
+            confirmBtn.setVisibility(View.GONE);
+        }
+    }
+
+    @OnClick({R.id.back, R.id.confirm_btn, R.id.folder_layout, R.id.preview_layout, R.id.shadow})
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.back:
+                finish();
+                break;
+            case R.id.confirm_btn:
+                //完成选择，回调
+                break;
             case R.id.folder_layout:
                 //文件夹
                 if (animLock || albumFolderList.size() == 1) {
@@ -84,8 +113,16 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
                 startFloderAnim();
                 break;
             case R.id.preview_layout:
-                //预览
-
+                //预览已选中的Album List
+                if (albumFragment.getSelectList().size() == 0) {
+                    return;
+                }
+                Intent intent = new Intent(this, AlbumPreActivity.class);
+                intent.putParcelableArrayListExtra(PreAlbumConstants.ALBUM_LIST, new ArrayList<>(albumFragment.getSelectList()));
+                intent.putParcelableArrayListExtra(PreAlbumConstants.CHECK_LIST, new ArrayList<>(albumFragment.getSelectList()));
+                intent.putExtra(PreAlbumConstants.INDEX, 0);
+                intent.putExtra(PreAlbumConstants.LIMIT, bundle.getInt(PhotoPickConstants.CHECK_LIMIT));
+                startActivityForResult(intent, PreAlbumConstants.PRE_REQUEST);
                 break;
             case R.id.shadow:
                 if (shadowFlag) {
@@ -127,6 +164,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
         floderAdapter = new FloderAdapter(this, albumFolderList);
         floderAdapter.setOnFloderClickListener(this);
         folderRecyclerview.setAdapter(floderAdapter);
+        //// TODO: 2016/9/30 顶破天？
         FloderUtils.setFloderHeight(folderRecyclerview, 5);
         showAnim = ValueAnimator.ofFloat(1f, 0f);
         showAnim.setDuration(300);
@@ -210,17 +248,58 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
 
     @Override
     public void onClick(int position) {
-        Log.e("onClick", "onClick=" + position);
+        if (bundle.getInt(PhotoPickConstants.CHECK_LIMIT) != 1) {
+            //预览AlbumList
+            Intent intent = new Intent(this, AlbumPreActivity.class);
+            intent.putParcelableArrayListExtra(PreAlbumConstants.ALBUM_LIST, new ArrayList<>(albumFragment.getAlbumList()));
+            intent.putParcelableArrayListExtra(PreAlbumConstants.CHECK_LIST, new ArrayList<>(albumFragment.getSelectList()));
+            intent.putExtra(PreAlbumConstants.INDEX, position);
+            intent.putExtra(PreAlbumConstants.LIMIT, bundle.getInt(PhotoPickConstants.CHECK_LIMIT));
+            startActivityForResult(intent, PreAlbumConstants.PRE_REQUEST);
+        } else {
+            if (bundle.getBoolean(PhotoPickConstants.NEED_CLIP, false)) {
+                //裁剪后再回调
+
+            } else {
+                //直接回调
+                Intent data = new Intent();
+                data.putExtra(PhotoPickConstants.RESULT_DATA, albumFragment.getAlbumList().get(position).getPath());
+                setResult(Activity.RESULT_OK, data);
+                finish();
+            }
+        }
     }
 
     @Override
     public void onSelect(int select) {
+        //点击触发刷新ui
         if (select != 0) {
-            previewText.setEnabled(true);
             previewText.setText("预览(" + select + ")");
+            confirmBtn.setText("完成(" + select + "/" + bundle.getInt(PhotoPickConstants.CHECK_LIMIT) + ")");
+            previewText.setEnabled(true);
+            confirmBtn.setEnabled(true);
         } else {
-            previewText.setText("预览");
             previewText.setEnabled(false);
+            confirmBtn.setEnabled(false);
+            previewText.setText("预览");
+            confirmBtn.setText("完成");
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && requestCode == PreAlbumConstants.PRE_REQUEST) {
+            if (data.getBooleanExtra(PreAlbumConstants.FINISH, false)) {
+                //直接结束
+                setResult(Activity.RESULT_OK, data);
+                finish();
+            } else {
+                //刷新更改的
+                List<AlbumBean> checkList = data.getParcelableArrayListExtra(PreAlbumConstants.CHECK_LIST);
+                albumFragment.setCheckList(checkList);
+                onSelect(checkList.size());
+            }
         }
     }
 }

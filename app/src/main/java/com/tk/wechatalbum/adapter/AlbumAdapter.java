@@ -38,10 +38,9 @@ public class AlbumAdapter extends RecyclerView.Adapter<ViewHolder> {
     private int size;
 
 
-    public AlbumAdapter(Context mContext, List<AlbumBean> mList, boolean showCamera, int limit) {
+    public AlbumAdapter(Context mContext, List<AlbumBean> mList, int limit) {
         this.mContext = mContext;
         this.mList = mList;
-        this.showCamera = showCamera;
         this.limit = limit;
         if (limit == 1) {
             single = true;
@@ -100,7 +99,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<ViewHolder> {
                     .override(size, size)
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .into(multiHolder.item);
-            if (checkHasInsert(bean)) {
+            if (checkList.contains(bean)) {
                 multiHolder.cover.setVisibility(View.VISIBLE);
                 multiHolder.indicator.setChecked(true);
             } else {
@@ -173,18 +172,9 @@ public class AlbumAdapter extends RecyclerView.Adapter<ViewHolder> {
         }
     }
 
-    /**
-     * 判断集合中是否已经添加
-     *
-     * @return
-     */
-    private boolean checkHasInsert(AlbumBean bean) {
-        for (AlbumBean b : checkList) {
-            if (b.equals(bean)) {
-                return true;
-            }
-        }
-        return false;
+    public void setCheckList(List<AlbumBean> checkList) {
+        this.checkList = checkList;
+        notifyDataSetChanged();
     }
 
     /**

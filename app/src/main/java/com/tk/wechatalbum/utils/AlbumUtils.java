@@ -1,6 +1,6 @@
 package com.tk.wechatalbum.utils;
 
-import android.content.Context;
+import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -9,6 +9,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
+import android.view.WindowManager;
 
 import com.tk.wechatalbum.bean.AlbumBean;
 import com.tk.wechatalbum.bean.AlbumFolderBean;
@@ -20,9 +21,10 @@ import java.util.List;
 
 /**
  * Created by TK on 2016/9/26.
+ * 相册通用工具类
  */
 
-public class AlbumUtils {
+public final class AlbumUtils {
     /**
      * 初始化数据源
      *
@@ -42,16 +44,16 @@ public class AlbumUtils {
                 MediaStore.Images.Media.SIZE,
                 MediaStore.Images.Media._ID};
         private OnLoadAlbumListener onLoadAlbumListener;
-        private Context mContext;
+        private FragmentActivity activity;
 
-        public AlbumLoaderCallback(Context mContext, OnLoadAlbumListener onLoadAlbumListener) {
-            this.mContext = mContext;
+        public AlbumLoaderCallback(FragmentActivity activity, OnLoadAlbumListener onLoadAlbumListener) {
+            this.activity = activity;
             this.onLoadAlbumListener = onLoadAlbumListener;
         }
 
         @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            CursorLoader cursorLoader = new CursorLoader(mContext,
+        public final Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            CursorLoader cursorLoader = new CursorLoader(activity,
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                     IMAGE_PROJECTION,
                     IMAGE_PROJECTION[4] + ">0 AND " +
@@ -65,13 +67,14 @@ public class AlbumUtils {
         }
 
         @Override
-        public void onLoadFinished(Loader loader, Cursor data) {
+        public final void onLoadFinished(Loader loader, Cursor data) {
             List<AlbumFolderBean> foldList = new ArrayList<AlbumFolderBean>();
             List<AlbumBean> albumList = new ArrayList<AlbumBean>();
             if (data == null || data.getCount() == 0) {
                 if (onLoadAlbumListener != null) {
                     onLoadAlbumListener.onComplete(albumList, foldList);
                 }
+                activity.getSupportLoaderManager().destroyLoader(0);
                 return;
             }
             AlbumBean albumBean;
@@ -107,6 +110,7 @@ public class AlbumUtils {
             if (onLoadAlbumListener != null) {
                 onLoadAlbumListener.onComplete(albumList, foldList);
             }
+            activity.getSupportLoaderManager().destroyLoader(0);
         }
 
         @Override
@@ -121,7 +125,7 @@ public class AlbumUtils {
      * @param path
      * @return
      */
-    private static boolean exists(String path) {
+    private static final boolean exists(String path) {
         if (!TextUtils.isEmpty(path)) {
             return new File(path).exists();
         }
@@ -135,7 +139,7 @@ public class AlbumUtils {
      * @param path
      * @return
      */
-    private static int isFolderHas(List<AlbumFolderBean> foldList, String path) {
+    private static final int isFolderHas(List<AlbumFolderBean> foldList, String path) {
         int index = -1;
         for (int i = 0; i < foldList.size(); i++) {
             if (foldList.get(i).getFolderPath().equals(path)) {
@@ -144,5 +148,22 @@ public class AlbumUtils {
             }
         }
         return index;
+    }
+
+    /**
+     * 大图查看是的是否需要动态全屏
+     *
+     * @param activity
+     * @param enable
+     */
+    public static final void needFullScreen(Activity activity, boolean enable) {
+        WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+        if (enable) {
+            lp.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        }
+        activity.getWindow().setAttributes(lp);
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     }
 }

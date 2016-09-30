@@ -3,21 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/top_layout"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical">
-
-    </LinearLayout>
+    <include layout="@layout/include_header" />
 
     <FrameLayout
         android:id="@+id/main_album"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/top_layout"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/header_layout" />
 
 
     <LinearLayout
@@ -58,7 +50,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="#CC000000"
+            android:background="#BB000000"
             android:clickable="true">
 
             <LinearLayout
@@ -79,7 +71,7 @@
                     android:duplicateParentState="true"
                     android:text="所有图片"
                     android:textColor="@drawable/floder_text_color"
-                    android:textSize="16sp" />
+                    android:textSize="17sp" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -100,9 +92,9 @@
                 <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@android:color/black" />
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginTop="12dp"
+                    android:background="#282828" />
 
                 <TextView
                     android:id="@+id/preview_text"

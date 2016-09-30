@@ -8,8 +8,8 @@ import java.util.Date;
  * Created by TK on 2016/9/27.
  */
 
-public class DateUtils {
-    public static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM");
+public final class DateUtils {
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM");
 
     /**
      * 得到解析时间

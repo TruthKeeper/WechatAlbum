@@ -1,9 +1,13 @@
 package com.tk.wechatalbum.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by TK on 2016/8/24.
+ * 相册bean
  */
-public class AlbumBean {
+public class AlbumBean implements Parcelable {
     private String path;
     private String name;
     private long date;
@@ -57,4 +61,34 @@ public class AlbumBean {
                 ", date=" + date +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.path);
+        dest.writeString(this.name);
+        dest.writeLong(this.date);
+    }
+
+    protected AlbumBean(Parcel in) {
+        this.path = in.readString();
+        this.name = in.readString();
+        this.date = in.readLong();
+    }
+
+    public static final Parcelable.Creator<AlbumBean> CREATOR = new Parcelable.Creator<AlbumBean>() {
+        @Override
+        public AlbumBean createFromParcel(Parcel source) {
+            return new AlbumBean(source);
+        }
+
+        @Override
+        public AlbumBean[] newArray(int size) {
+            return new AlbumBean[size];
+        }
+    };
 }

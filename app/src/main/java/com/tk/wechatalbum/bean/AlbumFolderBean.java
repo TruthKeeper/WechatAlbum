@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * Created by TK on 2016/8/24.
+ * 相册文件夹预览bean
  */
 public class AlbumFolderBean {
     //封面路径

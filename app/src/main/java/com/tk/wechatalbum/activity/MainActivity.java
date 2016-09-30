@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
             public void onInsert(int other) {
                 //显示拍照，不裁剪
                 PhotoPick.builder()
-                        .showCamera()
                         .setPhotoCheckLimit(other)
                         .checkAndStart(MainActivity.this);
             }
@@ -92,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_album_plus:
                 //相册，裁剪
                 PhotoPick.builder()
+                        .showCamera(false)
                         .needClip()
                         .setPhotoCheckLimit(1)
                         .checkAndStart(this);
