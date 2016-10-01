@@ -9,9 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.tk.wechatalbum.R;
 import com.tk.wechatalbum.bean.AlbumFolderBean;
+import com.tk.wechatalbum.ui.FolderCheckView;
 
 import java.util.List;
 
@@ -23,14 +23,14 @@ import butterknife.ButterKnife;
  * 文件夹adapter
  */
 
-public class FloderAdapter extends RecyclerView.Adapter<FloderAdapter.ItemHolder> {
+public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ItemHolder> {
     private Context mContext;
     private LayoutInflater mInflater;
     private List<AlbumFolderBean> mList;
     private int index = 0;
-    private onFloderClickListener onFloderClickListener;
+    private onFolderClickListener onFolderClickListener;
 
-    public FloderAdapter(Context mContext, List<AlbumFolderBean> mList) {
+    public FolderAdapter(Context mContext, List<AlbumFolderBean> mList) {
         this.mContext = mContext;
         this.mList = mList;
         this.mInflater = LayoutInflater.from(mContext);
@@ -46,15 +46,14 @@ public class FloderAdapter extends RecyclerView.Adapter<FloderAdapter.ItemHolder
         Glide.with(mContext)
                 .load(mList.get(position).getIndexPath())
                 .asBitmap()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.item);
         if (position == 0) {
-            holder.floderSize.setVisibility(View.GONE);
+            holder.folderSize.setVisibility(View.GONE);
         } else {
-            holder.floderSize.setVisibility(View.VISIBLE);
-            holder.floderSize.setText(mList.get(position).getAlbumList().size() + "张");
+            holder.folderSize.setVisibility(View.VISIBLE);
+            holder.folderSize.setText(mList.get(position).getAlbumList().size() + "张");
         }
-        holder.floderName.setText(mList.get(position).getFolderName());
+        holder.folderName.setText(mList.get(position).getFolderName());
         holder.indicator.setVisibility(position == index ? View.VISIBLE : View.GONE);
     }
 
@@ -66,20 +65,20 @@ public class FloderAdapter extends RecyclerView.Adapter<FloderAdapter.ItemHolder
     class ItemHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.item)
         ImageView item;
-        @BindView(R.id.floder_name)
-        TextView floderName;
-        @BindView(R.id.floder_size)
-        TextView floderSize;
+        @BindView(R.id.folder_name)
+        TextView folderName;
+        @BindView(R.id.folder_size)
+        TextView folderSize;
         @BindView(R.id.indicator)
-        View indicator;
+        FolderCheckView indicator;
 
         public ItemHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            if (onFloderClickListener != null) {
+            if (onFolderClickListener != null) {
                 itemView.setOnClickListener(v -> {
                     boolean change = index != getAdapterPosition();
-                    onFloderClickListener.onClick(getAdapterPosition(), change);
+                    onFolderClickListener.onClick(getAdapterPosition(), change);
                     if (!change) {
                         return;
                     }
@@ -92,11 +91,11 @@ public class FloderAdapter extends RecyclerView.Adapter<FloderAdapter.ItemHolder
         }
     }
 
-    public void setOnFloderClickListener(FloderAdapter.onFloderClickListener onFloderClickListener) {
-        this.onFloderClickListener = onFloderClickListener;
+    public void setOnFolderClickListener(onFolderClickListener onFolderClickListener) {
+        this.onFolderClickListener = onFolderClickListener;
     }
 
-    public interface onFloderClickListener {
+    public interface onFolderClickListener {
         void onClick(int position, boolean change);
     }
 

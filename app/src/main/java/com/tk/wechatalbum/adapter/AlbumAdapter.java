@@ -38,14 +38,12 @@ public class AlbumAdapter extends RecyclerView.Adapter<ViewHolder> {
     private int size;
 
 
-    public AlbumAdapter(Context mContext, List<AlbumBean> mList, int limit) {
+    public AlbumAdapter(Context mContext, List<AlbumBean> mList, int limit, boolean isSingle) {
         this.mContext = mContext;
         this.mList = mList;
         this.limit = limit;
-        if (limit == 1) {
-            single = true;
-        } else {
-            single = false;
+        this.single = isSingle;
+        if (!isSingle) {
             checkList = new ArrayList<AlbumBean>();
         }
         this.mInflater = LayoutInflater.from(mContext);

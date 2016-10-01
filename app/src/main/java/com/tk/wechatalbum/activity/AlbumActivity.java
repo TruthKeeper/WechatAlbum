@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,14 +19,14 @@ import android.widget.TextView;
 
 import com.tk.wechatalbum.R;
 import com.tk.wechatalbum.adapter.AlbumAdapter;
-import com.tk.wechatalbum.adapter.FloderAdapter;
+import com.tk.wechatalbum.adapter.FolderAdapter;
 import com.tk.wechatalbum.bean.AlbumBean;
 import com.tk.wechatalbum.bean.AlbumFolderBean;
-import com.tk.wechatalbum.callback.OnFloderListener;
+import com.tk.wechatalbum.callback.OnFolderListener;
 import com.tk.wechatalbum.fragment.AlbumFragment;
 import com.tk.wechatalbum.ui.ConfirmButton;
-import com.tk.wechatalbum.ui.FloderItemDecoration;
-import com.tk.wechatalbum.utils.FloderUtils;
+import com.tk.wechatalbum.ui.FolderItemDecoration;
+import com.tk.wechatalbum.utils.FolderUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ import static com.tk.wechatalbum.Constants.PreAlbumConstants;
 /**
  * Created by TK on 2016/8/10.
  */
-public class AlbumActivity extends AppCompatActivity implements OnFloderListener, FloderAdapter.onFloderClickListener, AlbumAdapter.OnAlbumSelectListener {
+public class AlbumActivity extends AppCompatActivity implements OnFolderListener, FolderAdapter.onFolderClickListener, AlbumAdapter.OnAlbumSelectListener {
 
     @BindView(R.id.confirm_btn)
     ConfirmButton confirmBtn;
@@ -58,7 +59,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
     @BindView(R.id.shadow_layout)
     LinearLayout shadowLayout;
     private AlbumFragment albumFragment = new AlbumFragment();
-    private FloderAdapter floderAdapter;
+    private FolderAdapter folderAdapter;
     //文件夹list
     private List<AlbumFolderBean> albumFolderList = new ArrayList<AlbumFolderBean>();
     private ValueAnimator showAnim;
@@ -67,6 +68,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
     private boolean animLock;
     private boolean shadowFlag;
     private Bundle bundle;
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +81,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
         //继续传递
         albumFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().add(R.id.main_album, albumFragment).commit();
-        albumFragment.setOnFloderListener(this);
+        albumFragment.setOnFolderListener(this);
         albumFragment.setOnAlbumSelectListener(this);
 
     }
@@ -89,7 +91,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
      */
     private void initConstants() {
         bundle = getIntent().getExtras();
-        if (bundle.getInt(PhotoPickConstants.CHECK_LIMIT) == 1) {
+        if (bundle.getBoolean(PhotoPickConstants.IS_SINGLE)) {
             //单选模式
             previewLayout.setVisibility(View.GONE);
             confirmBtn.setVisibility(View.GONE);
@@ -104,29 +106,41 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
                 break;
             case R.id.confirm_btn:
                 //完成选择，回调
+                Intent intent = new Intent();
+                List<AlbumBean> checkList = albumFragment.getSelectList();
+                if (bundle.getInt(PhotoPickConstants.CHECK_LIMIT) == 1
+                        || checkList.size() == 1) {
+                    intent.putExtra(PhotoPickConstants.RESULT_SINGLE, true);
+                    intent.putExtra(PhotoPickConstants.RESULT_DATA, checkList.get(0).getPath());
+                } else {
+                    intent.putExtra(PhotoPickConstants.RESULT_SINGLE, false);
+                    intent.putParcelableArrayListExtra(PhotoPickConstants.RESULT_DATA, new ArrayList<>(checkList));
+                }
+                setResult(Activity.RESULT_OK, intent);
+                finish();
                 break;
             case R.id.folder_layout:
                 //文件夹
                 if (animLock || albumFolderList.size() == 1) {
                     return;
                 }
-                startFloderAnim();
+                startFolderAnim();
                 break;
             case R.id.preview_layout:
                 //预览已选中的Album List
                 if (albumFragment.getSelectList().size() == 0) {
                     return;
                 }
-                Intent intent = new Intent(this, AlbumPreActivity.class);
-                intent.putParcelableArrayListExtra(PreAlbumConstants.ALBUM_LIST, new ArrayList<>(albumFragment.getSelectList()));
-                intent.putParcelableArrayListExtra(PreAlbumConstants.CHECK_LIST, new ArrayList<>(albumFragment.getSelectList()));
-                intent.putExtra(PreAlbumConstants.INDEX, 0);
-                intent.putExtra(PreAlbumConstants.LIMIT, bundle.getInt(PhotoPickConstants.CHECK_LIMIT));
-                startActivityForResult(intent, PreAlbumConstants.PRE_REQUEST);
+                Intent preIntent = new Intent(this, AlbumPreActivity.class);
+                preIntent.putParcelableArrayListExtra(PreAlbumConstants.ALBUM_LIST, new ArrayList<>(albumFragment.getSelectList()));
+                preIntent.putParcelableArrayListExtra(PreAlbumConstants.CHECK_LIST, new ArrayList<>(albumFragment.getSelectList()));
+                preIntent.putExtra(PreAlbumConstants.INDEX, 0);
+                preIntent.putExtra(PreAlbumConstants.LIMIT, bundle.getInt(PhotoPickConstants.CHECK_LIMIT));
+                startActivityForResult(preIntent, PreAlbumConstants.PRE_REQUEST);
                 break;
             case R.id.shadow:
                 if (shadowFlag) {
-                    startFloderAnim();
+                    startFolderAnim();
                 }
                 break;
         }
@@ -135,7 +149,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
     /**
      * 切入切出动画
      */
-    private void startFloderAnim() {
+    private void startFolderAnim() {
         if (folderRecyclerview.getVisibility() == View.GONE) {
             showAnim.start();
         } else {
@@ -147,7 +161,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (folderRecyclerview.getVisibility() == View.VISIBLE) {
-                startFloderAnim();
+                startFolderAnim();
                 return true;
             }
         }
@@ -155,17 +169,17 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
     }
 
     @Override
-    public void onFloderComplete(List<AlbumFolderBean> albumFolderList) {
+    public void onFolderComplete(List<AlbumFolderBean> albumFolderList) {
         //取的数据后的回调，初始化相应操作
         folderRecyclerview.setHasFixedSize(true);
-        folderRecyclerview.addItemDecoration(new FloderItemDecoration(this));
+        folderRecyclerview.addItemDecoration(new FolderItemDecoration(this));
         folderRecyclerview.setLayoutManager(new LinearLayoutManager(this));
         this.albumFolderList = albumFolderList;
-        floderAdapter = new FloderAdapter(this, albumFolderList);
-        floderAdapter.setOnFloderClickListener(this);
-        folderRecyclerview.setAdapter(floderAdapter);
+        folderAdapter = new FolderAdapter(this, albumFolderList);
+        folderAdapter.setOnFolderClickListener(this);
+        folderRecyclerview.setAdapter(folderAdapter);
         //// TODO: 2016/9/30 顶破天？
-        FloderUtils.setFloderHeight(folderRecyclerview, 5);
+        FolderUtils.setFolderHeight(folderRecyclerview, 5);
         showAnim = ValueAnimator.ofFloat(1f, 0f);
         showAnim.setDuration(300);
         showAnim.addUpdateListener(animation -> changeUI((float) animation.getAnimatedValue()));
@@ -235,10 +249,14 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
 
     @Override
     public void onClick(int position, boolean change) {
-        dismiss.start();
-        if (change) {
-            albumFragment.setAlbumList(albumFolderList.get(position).getAlbumList(), position == 0);
-        }
+        handler.postDelayed(() -> {
+            dismiss.start();
+            if (change) {
+                folderText.setText(albumFolderList.get(position).getFolderName());
+                albumFragment.setAlbumList(albumFolderList.get(position).getAlbumList(), position == 0);
+            }
+        }, 350);
+
     }
 
     @Override
@@ -263,6 +281,7 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
             } else {
                 //直接回调
                 Intent data = new Intent();
+                data.putExtra(PhotoPickConstants.RESULT_SINGLE, true);
                 data.putExtra(PhotoPickConstants.RESULT_DATA, albumFragment.getAlbumList().get(position).getPath());
                 setResult(Activity.RESULT_OK, data);
                 finish();
@@ -275,7 +294,11 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
         //点击触发刷新ui
         if (select != 0) {
             previewText.setText("预览(" + select + ")");
-            confirmBtn.setText("完成(" + select + "/" + bundle.getInt(PhotoPickConstants.CHECK_LIMIT) + ")");
+            if (bundle.getInt(PhotoPickConstants.CHECK_LIMIT, 1) == 1 && select == 1) {
+                confirmBtn.setText("完成");
+            } else {
+                confirmBtn.setText("完成(" + select + "/" + bundle.getInt(PhotoPickConstants.CHECK_LIMIT) + ")");
+            }
             previewText.setEnabled(true);
             confirmBtn.setEnabled(true);
         } else {
@@ -291,8 +314,17 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == PreAlbumConstants.PRE_REQUEST) {
             if (data.getBooleanExtra(PreAlbumConstants.FINISH, false)) {
-                //直接结束
-                setResult(Activity.RESULT_OK, data);
+                //完成了选择
+                List<AlbumBean> checkList = data.getParcelableArrayListExtra(PreAlbumConstants.CHECK_LIST);
+                Intent intent = new Intent();
+                if (checkList.size() == 1) {
+                    intent.putExtra(PhotoPickConstants.RESULT_SINGLE, true);
+                    intent.putExtra(PhotoPickConstants.RESULT_DATA, checkList.get(0).getPath());
+                } else {
+                    intent.putExtra(PhotoPickConstants.RESULT_SINGLE, false);
+                    intent.putParcelableArrayListExtra(PhotoPickConstants.RESULT_DATA, new ArrayList<>(checkList));
+                }
+                setResult(Activity.RESULT_OK, intent);
                 finish();
             } else {
                 //刷新更改的
@@ -302,4 +334,6 @@ public class AlbumActivity extends AppCompatActivity implements OnFloderListener
             }
         }
     }
+
+
 }

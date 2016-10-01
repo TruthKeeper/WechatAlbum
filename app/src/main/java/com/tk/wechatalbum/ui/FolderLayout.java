@@ -15,7 +15,7 @@ import com.tk.wechatalbum.utils.DensityUtil;
  * Created by TK on 2016/9/27.
  */
 
-public class FloderLayout extends RelativeLayout {
+public class FolderLayout extends RelativeLayout {
     private Paint paint = new Paint();
     private Path path_1 = new Path();
     private Path path_2 = new Path();
@@ -23,11 +23,11 @@ public class FloderLayout extends RelativeLayout {
     private int dark_v0;
     private int dark_v1;
 
-    public FloderLayout(Context context) {
+    public FolderLayout(Context context) {
         this(context, null);
     }
 
-    public FloderLayout(Context context, AttributeSet attrs) {
+    public FolderLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         paint.setDither(true);
         paint.setAntiAlias(true);

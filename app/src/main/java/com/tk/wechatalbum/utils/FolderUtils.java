@@ -8,14 +8,14 @@ import com.tk.wechatalbum.R;
  * Created by TK on 2016/9/28.
  */
 
-public class FloderUtils {
+public class FolderUtils {
     /**
      * 动态设置高度
      *
      * @param recyclerView
      * @param limit
      */
-    public static final void setFloderHeight(final RecyclerView recyclerView, final int limit) {
+    public static final void setFolderHeight(final RecyclerView recyclerView, final int limit) {
         if (recyclerView.getAdapter() == null || recyclerView.getAdapter().getItemCount() == 0) {
             return;
         }

@@ -7,13 +7,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.tk.wechatalbum.R;
-import com.tk.wechatalbum.bean.AlbumBean;
+import com.tk.wechatalbum.utils.FileUtils;
 
 import java.io.File;
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by TK on 2016/8/10.
@@ -25,11 +29,11 @@ public class NinePreAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static final int MAX = 9;
     private Context mContext;
     private LayoutInflater mInflater;
-    private List<AlbumBean> mList;
+    private List<File> mList;
     private int size;
     private OnPreClickListener onPreClickListener;
 
-    public NinePreAdapter(Context mContext, List<AlbumBean> mList) {
+    public NinePreAdapter(Context mContext, List<File> mList) {
         this.mContext = mContext;
         this.mList = mList;
         this.mInflater = LayoutInflater.from(mContext);
@@ -63,15 +67,22 @@ public class NinePreAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         if (holder instanceof ItemHolder) {
-            Glide.with(mContext).load(new File(mList.get(position).getPath()))
+            Glide.with(mContext).load(mList.get(position))
                     .asBitmap()
-                    .into((ImageView) holder.itemView);
+                    .into(((ItemHolder) holder).item);
+            ((ItemHolder) holder).textview.setText(FileUtils.getImaSize(mList.get(position)));
         }
     }
 
     class ItemHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.item)
+        ImageView item;
+        @BindView(R.id.textview)
+        TextView textview;
+
         public ItemHolder(View itemView) {
             super(itemView);
+            ButterKnife.bind(this, itemView);
             if (onPreClickListener != null) {
                 itemView.setOnClickListener(v -> {
                     onPreClickListener.onPre(getAdapterPosition());
@@ -100,4 +111,5 @@ public class NinePreAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         void onInsert(int other);
     }
+
 }

@@ -17,10 +17,12 @@ public final class Constants {
         public static final int ALBUM_REQUEST = 10001;
         public static final int DEFAULT_LIMIT = 9;
         public static final String START_CAMERA = "start_camera";
+        public static final String IS_SINGLE = "is_single";
         public static final String CHECK_LIMIT = "check_limit";
         public static final String SHOW_CAMERA = "show_camera";
         public static final String NEED_CLIP = "need_clip";
-        //回调图片结果
+        //回调图片结果 flag=true data为单张，false，data为list，仅对结果处理，不与IS_SINGLE对应
+        public static final String RESULT_SINGLE = "result_single";
         public static final String RESULT_DATA = "result_data";
     }
 

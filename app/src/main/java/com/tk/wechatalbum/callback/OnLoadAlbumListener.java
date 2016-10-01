@@ -7,9 +7,10 @@ import java.util.List;
 
 /**
  * Created by TK on 2016/9/26.
+ * load相册完毕回调
  */
 
 public interface OnLoadAlbumListener {
-    void onComplete(List<AlbumBean> albumList, List<AlbumFolderBean> albumFolderList);
 
+    void onComplete(List<AlbumBean> albumList, List<AlbumFolderBean> albumFolderList);
 }

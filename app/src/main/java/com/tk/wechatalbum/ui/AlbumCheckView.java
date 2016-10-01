@@ -13,7 +13,7 @@ import android.graphics.drawable.shapes.RoundRectShape;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.tk.wechatalbum.R;
+import com.tk.wechatalbum.PhotoPick;
 import com.tk.wechatalbum.utils.DensityUtil;
 
 /**
@@ -51,7 +51,7 @@ public class AlbumCheckView extends View {
     private void init() {
         //硬件加速
         setLayerType(LAYER_TYPE_SOFTWARE, null);
-        themeColor = getResources().getColor(R.color.base_color);
+        themeColor = PhotoPick.themeColor;
 
         padding = DensityUtil.dp2px(getContext(), PADDING);
         radius = DensityUtil.dp2px(getContext(), RADIUS);

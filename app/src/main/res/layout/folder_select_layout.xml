@@ -7,7 +7,7 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <com.tk.wechatalbum.ui.FloderLayout
+    <com.tk.wechatalbum.ui.FolderLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"
@@ -18,7 +18,7 @@
             android:layout_width="74dp"
             android:layout_height="74dp"
             android:scaleType="centerCrop" />
-    </com.tk.wechatalbum.ui.FloderLayout>
+    </com.tk.wechatalbum.ui.FolderLayout>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -28,7 +28,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/floder_name"
+            android:id="@+id/folder_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAllCaps="false"
@@ -36,7 +36,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/floder_size"
+            android:id="@+id/folder_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
@@ -45,10 +45,9 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <View
+    <com.tk.wechatalbum.ui.FolderCheckView
         android:id="@+id/indicator"
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:layout_marginRight="12dp"
-        android:background="@drawable/layer_floder_select" />
+        android:layout_marginRight="12dp" />
 </LinearLayout>

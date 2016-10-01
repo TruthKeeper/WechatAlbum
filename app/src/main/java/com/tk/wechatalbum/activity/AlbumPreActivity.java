@@ -185,6 +185,10 @@ public class AlbumPreActivity extends AppCompatActivity implements ViewPager.OnP
      */
     private void refreshOnResult(boolean finish) {
         Intent data = new Intent();
+        if (finish && checkList.size() == 0) {
+            //仿微信人性化设计，checkList==0空时添加当前的index
+            checkList.add(albumList.get(albumViewpager.getCurrentItem()));
+        }
         data.putParcelableArrayListExtra(PreAlbumConstants.CHECK_LIST, new ArrayList<>(checkList));
         data.putExtra(PreAlbumConstants.FINISH, finish);
         setResult(Activity.RESULT_OK, data);

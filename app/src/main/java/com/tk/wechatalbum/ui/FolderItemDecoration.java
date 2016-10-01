@@ -13,14 +13,14 @@ import com.tk.wechatalbum.utils.DensityUtil;
 /**
  * Created by TK on 2016/9/26.
  */
-public class FloderItemDecoration extends RecyclerView.ItemDecoration {
+public class FolderItemDecoration extends RecyclerView.ItemDecoration {
     //网格线粗细
     public static final int DIVIDER = 1;
     private static final ColorDrawable DRAWABLE = new ColorDrawable(0xFFECECEC);
     private Context mContext;
     private int divider;
 
-    public FloderItemDecoration(Context mContext) {
+    public FolderItemDecoration(Context mContext) {
         this.mContext = mContext;
         divider = DensityUtil.dp2px(mContext, DIVIDER);
     }

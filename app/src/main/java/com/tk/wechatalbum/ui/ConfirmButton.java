@@ -10,7 +10,7 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.TextView;
 
-import com.tk.wechatalbum.R;
+import com.tk.wechatalbum.PhotoPick;
 import com.tk.wechatalbum.utils.DensityUtil;
 import com.tk.wechatalbum.utils.ThemeUtils;
 
@@ -30,7 +30,6 @@ public class ConfirmButton extends TextView {
             0xFF999999};
     public static final int RADIUS = 2;
     private Paint paint = new Paint();
-    private int themeColor;
     private int[] colors;
 
     private ShapeDrawable enableDrawable;
@@ -53,8 +52,7 @@ public class ConfirmButton extends TextView {
         setTextSize(14);
         paint.setDither(true);
         paint.setAntiAlias(true);
-        themeColor = getResources().getColor(R.color.base_color);
-        colors = ThemeUtils.initNewColor(themeColor);
+        colors = ThemeUtils.initNewColor(PhotoPick.themeColor);
         int r = DensityUtil.dp2px(getContext(), RADIUS);
         float[] outR = new float[]{r, r, r, r, r, r, r, r};
         RoundRectShape enableShape = new RoundRectShape(outR, null, null);

@@ -16,7 +16,7 @@ import com.tk.wechatalbum.adapter.AlbumAdapter;
 import com.tk.wechatalbum.adapter.AlbumAdapter.OnAlbumSelectListener;
 import com.tk.wechatalbum.bean.AlbumBean;
 import com.tk.wechatalbum.bean.AlbumFolderBean;
-import com.tk.wechatalbum.callback.OnFloderListener;
+import com.tk.wechatalbum.callback.OnFolderListener;
 import com.tk.wechatalbum.callback.OnLoadAlbumListener;
 import com.tk.wechatalbum.ui.AlbumItemDecoration;
 import com.tk.wechatalbum.utils.AlbumUtils;
@@ -50,7 +50,7 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
     private Bundle bundle;
     private AlphaAnimation showAnim;
     private AlphaAnimation dismissAnim;
-    private OnFloderListener onFloderListener;
+    private OnFolderListener onFolderListener;
     private OnAlbumSelectListener onAlbumSelectListener;
 
     @Override
@@ -81,7 +81,8 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
         recyclerview.addItemDecoration(new AlbumItemDecoration(mContext, 3));
         albumAdapter = new AlbumAdapter(mContext,
                 albumList,
-                bundle.getInt(PhotoPickConstants.CHECK_LIMIT));
+                bundle.getInt(PhotoPickConstants.CHECK_LIMIT),
+                bundle.getBoolean(PhotoPickConstants.IS_SINGLE));
         albumAdapter.setOnAlbumSelectListener(onAlbumSelectListener);
         recyclerview.setAdapter(albumAdapter);
         recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -129,8 +130,8 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
         //防止界面闪烁，后续设置
         albumAdapter.setShowCamera(bundle.getBoolean(PhotoPickConstants.SHOW_CAMERA, false));
         albumAdapter.notifyDataSetChanged();
-        if (onFloderListener != null) {
-            onFloderListener.onFloderComplete(albumFolderList);
+        if (onFolderListener != null) {
+            onFolderListener.onFolderComplete(albumFolderList);
         }
     }
 
@@ -175,7 +176,7 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
         this.onAlbumSelectListener = onAlbumSelectListener;
     }
 
-    public void setOnFloderListener(OnFloderListener onFloderListener) {
-        this.onFloderListener = onFloderListener;
+    public void setOnFolderListener(OnFolderListener onFolderListener) {
+        this.onFolderListener = onFolderListener;
     }
 }
