@@ -17,6 +17,13 @@
             android:layout_marginTop="5dp"
             android:text="点我开启智能压缩模式" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" * 50k以下不压缩；
+ * 150k以下一档 → 60k左右；
+ * 150k以上三挡 → 一般不超过150k；" />
+
         <ImageView
             android:id="@+id/iv_show"
             android:layout_width="@dimen/normal_avatar"

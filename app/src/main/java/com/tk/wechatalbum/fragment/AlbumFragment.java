@@ -52,6 +52,7 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
     private AlphaAnimation dismissAnim;
     private OnFolderListener onFolderListener;
     private OnAlbumSelectListener onAlbumSelectListener;
+    private OnScrollListener onScrollListener;
 
     @Override
     public void onAttach(Context context) {
@@ -85,40 +86,14 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
                 bundle.getBoolean(PhotoPickConstants.IS_SINGLE));
         albumAdapter.setOnAlbumSelectListener(onAlbumSelectListener);
         recyclerview.setAdapter(albumAdapter);
-        recyclerview.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                //顶部时间条的显示
-                //// TODO: 2016/9/28
-                if (newState == RecyclerView.SCROLL_STATE_IDLE
-                        && photoTip.getVisibility() == View.VISIBLE) {
-                    photoTip.setVisibility(View.GONE);
-                    photoTip.clearAnimation();
-                    photoTip.startAnimation(dismissAnim);
-                } else if (photoTip.getVisibility() == View.GONE
-                        && albumList.size() != 0) {
-                    photoTip.setVisibility(View.VISIBLE);
-                    photoTip.clearAnimation();
-                    photoTip.startAnimation(showAnim);
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int position = gridLayoutManager.findFirstVisibleItemPosition();
-                if (albumList.size() != 0) {
-                    photoTip.setText(DateUtils.getDateStr(albumList.get(position).getDate()));
-                }
-            }
-        });
+        onScrollListener = new OnScrollListener();
+        recyclerview.addOnScrollListener(onScrollListener);
         //初始化数据源
         AlbumUtils.initAlbumData(getActivity(), this);
     }
 
     /**
-     * load加载完毕
+     * load加载完毕，只调用一次
      *
      * @param albumList
      * @param albumFolderList
@@ -137,8 +112,13 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
 
     @Override
     public void onDestroyView() {
+        if (onScrollListener != null) {
+            recyclerview.removeOnScrollListener(onScrollListener);
+            onScrollListener = null;
+        }
         super.onDestroyView();
         unbinder.unbind();
+
     }
 
     /**
@@ -162,6 +142,39 @@ public class AlbumFragment extends Fragment implements OnLoadAlbumListener {
         albumAdapter.setShowCamera(firstIndex && bundle.getBoolean(PhotoPickConstants.SHOW_CAMERA, false));
         albumAdapter.notifyDataSetChanged();
         recyclerview.scrollToPosition(0);
+    }
+
+    private class OnScrollListener extends RecyclerView.OnScrollListener {
+        public OnScrollListener() {
+            super();
+        }
+
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+            //顶部时间条的显示
+            //// TODO: 2016/9/28
+            if (newState == RecyclerView.SCROLL_STATE_IDLE
+                    && photoTip.getVisibility() == View.VISIBLE) {
+                photoTip.setVisibility(View.GONE);
+                photoTip.clearAnimation();
+                photoTip.startAnimation(dismissAnim);
+            } else if (photoTip.getVisibility() == View.GONE
+                    && albumList.size() != 0) {
+                photoTip.setVisibility(View.VISIBLE);
+                photoTip.clearAnimation();
+                photoTip.startAnimation(showAnim);
+            }
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            int position = gridLayoutManager.findFirstVisibleItemPosition();
+            if (albumList.size() != 0) {
+                photoTip.setText(DateUtils.getDateStr(albumList.get(position).getDate()));
+            }
+        }
     }
 
     public List<AlbumBean> getAlbumList() {

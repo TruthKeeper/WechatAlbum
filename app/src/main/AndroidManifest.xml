@@ -11,7 +11,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MainActivity">
+        <activity
+            android:name=".activity.MainActivity"
+            android:configChanges="locale|keyboardHidden|orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,9 +23,15 @@
         </activity>
         <activity
             android:name=".activity.AlbumActivity"
+            android:configChanges="locale|keyboardHidden|orientation"
+            android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.Light.NoActionBar" />
         <activity
             android:name=".activity.AlbumPreActivity"
+            android:configChanges="locale|keyboardHidden|orientation"
+            android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Design.Light.NoActionBar" />
 
         <meta-data

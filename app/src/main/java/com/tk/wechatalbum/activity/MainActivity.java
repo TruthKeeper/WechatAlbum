@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -77,20 +78,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCamera() {
                 //拍照+裁剪
-                PhotoPick.builder()
+                if (PhotoPick.builder()
                         .takePhoto()
                         .needClip()
-                        .checkAndStart(MainActivity.this, 1);
+                        .checkAndStart(MainActivity.this, 1)) {
+                    selectBottomDialog.dismiss();
+                }
             }
 
             @Override
             public void onAlbum() {
                 //相册，裁剪
-                PhotoPick.builder()
+                if (PhotoPick.builder()
                         .asSingle(true)
                         .showCamera(false)
                         .needClip()
-                        .checkAndStart(MainActivity.this, 2);
+                        .checkAndStart(MainActivity.this, 2)) {
+                    selectBottomDialog.dismiss();
+                }
             }
         });
     }
@@ -125,14 +130,12 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case 1:
-
-                break;
             case 2:
-                PhotoPick.onActivityResult(requestCode, resultCode, data, checkbox.isChecked() ?
+                PhotoPick.onActivityResult(this, resultCode, data, checkbox.isChecked() ?
                         new AlbumCompressCallBack(this) : new AlbumCallBack());
                 break;
             case 3:
-                PhotoPick.onActivityResult(requestCode, resultCode, data, checkbox.isChecked() ?
+                PhotoPick.onActivityResult(this, resultCode, data, checkbox.isChecked() ?
                         new FriendCompressCallBack(this) : new FriendCallBack());
                 break;
         }
@@ -235,5 +238,11 @@ public class MainActivity extends AppCompatActivity {
         protected void onFinish() {
             progressDialog.dismiss();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("main", "onDestroy");
     }
 }

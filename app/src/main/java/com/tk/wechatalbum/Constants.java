@@ -9,12 +9,17 @@ import static com.tk.wechatalbum.Constants.PreAlbumConstants.INDEX;
  */
 
 public final class Constants {
+    //照片裁剪
+    public static final int CROP_REQUEST = 2333;
+    //拍照
+    public static final int CAMERA_REQUEST = 2334;
+    //拍照+裁剪
+    public static final int CAMERA_CROP_REQUEST = 2335;
+
     /**
      * PhotoPick参数
      */
     public static final class PhotoPickConstants {
-        public static final int CAMERA_REQUEST = 10000;
-        public static final int ALBUM_REQUEST = 10001;
         public static final int DEFAULT_LIMIT = 9;
         public static final String START_CAMERA = "start_camera";
         public static final String IS_SINGLE = "is_single";
@@ -30,7 +35,7 @@ public final class Constants {
      * 相册 to 相册预览传递参数
      */
     public static final class PreAlbumConstants {
-        public static final int PRE_REQUEST = 10002;
+        public static final int PRE_REQUEST = 2336;
         //预览列表
         public static final String ALBUM_LIST = "album_list";
         //选中列表

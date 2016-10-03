@@ -11,12 +11,13 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.tk.wechatalbum.Constants;
+import com.tk.wechatalbum.PhotoPick;
 import com.tk.wechatalbum.R;
 import com.tk.wechatalbum.adapter.AlbumAdapter;
 import com.tk.wechatalbum.adapter.FolderAdapter;
@@ -28,6 +29,7 @@ import com.tk.wechatalbum.ui.ConfirmButton;
 import com.tk.wechatalbum.ui.FolderItemDecoration;
 import com.tk.wechatalbum.utils.FolderUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +37,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.tk.wechatalbum.Constants.CROP_REQUEST;
 import static com.tk.wechatalbum.Constants.PhotoPickConstants;
 import static com.tk.wechatalbum.Constants.PreAlbumConstants;
 
@@ -261,7 +264,8 @@ public class AlbumActivity extends AppCompatActivity implements OnFolderListener
 
     @Override
     public void onCamera() {
-        Log.e("onCamera", "onCamera");
+        //相册中点击拍照
+        PhotoPick.startCamera(this, Constants.CAMERA_REQUEST, false);
     }
 
     @Override
@@ -277,7 +281,8 @@ public class AlbumActivity extends AppCompatActivity implements OnFolderListener
         } else {
             if (bundle.getBoolean(PhotoPickConstants.NEED_CLIP, false)) {
                 //裁剪后再回调
-
+                AlbumBean bean = albumFragment.getAlbumList().get(position);
+                PhotoPick.startCrop(this, new File(bean.getPath()), Constants.CROP_REQUEST);
             } else {
                 //直接回调
                 Intent data = new Intent();
@@ -312,9 +317,12 @@ public class AlbumActivity extends AppCompatActivity implements OnFolderListener
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK && requestCode == PreAlbumConstants.PRE_REQUEST) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode == PreAlbumConstants.PRE_REQUEST) {
             if (data.getBooleanExtra(PreAlbumConstants.FINISH, false)) {
-                //完成了选择
+                //预览回调
                 List<AlbumBean> checkList = data.getParcelableArrayListExtra(PreAlbumConstants.CHECK_LIST);
                 Intent intent = new Intent();
                 if (checkList.size() == 1) {
@@ -332,6 +340,25 @@ public class AlbumActivity extends AppCompatActivity implements OnFolderListener
                 albumFragment.setCheckList(checkList);
                 onSelect(checkList.size());
             }
+        } else if (requestCode == CROP_REQUEST) {
+            //裁剪完毕回调
+            Intent intent = new Intent();
+            intent.putExtra(PhotoPickConstants.RESULT_SINGLE, true);
+            intent.putExtra(PhotoPickConstants.RESULT_DATA, PhotoPick.tempCropFile.getPath());
+            setResult(Activity.RESULT_OK, intent);
+            finish();
+        } else if (requestCode == Constants.CAMERA_REQUEST) {
+            if (bundle.getBoolean(PhotoPickConstants.NEED_CLIP)) {
+                PhotoPick.startCrop(this, PhotoPick.tempCameraFile, Constants.CAMERA_CROP_REQUEST);
+            } else {
+                setResult(Activity.RESULT_OK);
+                finish();
+            }
+        } else if (requestCode == Constants.CAMERA_CROP_REQUEST) {
+            Intent intent = new Intent();
+            intent.putExtra(PhotoPickConstants.RESULT_SINGLE, true);
+            intent.putExtra(PhotoPickConstants.RESULT_DATA, PhotoPick.tempCropFile.getPath());
+            setResult(Activity.RESULT_OK, intent);
         }
     }
 

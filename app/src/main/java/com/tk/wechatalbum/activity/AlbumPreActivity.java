@@ -95,7 +95,7 @@ public class AlbumPreActivity extends AppCompatActivity implements ViewPager.OnP
      */
     private void initAnim() {
         valueAnimator = ValueAnimator.ofFloat(0f, 1f);
-        valueAnimator.setDuration(750);
+        valueAnimator.setDuration(500);
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
